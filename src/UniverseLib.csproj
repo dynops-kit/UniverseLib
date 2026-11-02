@@ -17,6 +17,9 @@
         <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
         <Configurations>Release_Mono;Release_IL2CPP_Unhollower;Release_IL2CPP_Interop_BIE;Release_IL2CPP_Interop_ML</Configurations>
     </PropertyGroup>
+    <PropertyGroup>
+        <GameAssembliesPath Condition="'$(GameAssembliesPath)' == ''">..\lib\interop</GameAssembliesPath>
+    </PropertyGroup>
     <!-- Configurations -->
     <PropertyGroup Condition=" '$(Configuration)' == 'Release_IL2CPP_Unhollower' ">
         <TargetFramework>net472</TargetFramework>
@@ -58,9 +61,19 @@
     <ItemGroup Condition="'$(Configuration)' == 'Release_IL2CPP_Unhollower'">
         <PackageReference Include="Il2CppAssemblyUnhollower.BaseLib" Version="0.4.22" IncludeAssets="compile" />
     </ItemGroup>
-    <ItemGroup Condition="'$(Configuration)' == 'Release_IL2CPP_Interop_BIE' or '$(Configuration)' == 'Release_IL2CPP_Interop_ML'">
+    <ItemGroup Condition="('$(Configuration)' == 'Release_IL2CPP_Interop_BIE' or '$(Configuration)' == 'Release_IL2CPP_Interop_ML') and '$(MelonLoaderRuntimePath)' == ''">
         <PackageReference Include="Il2CppInterop.Common" Version="1.0.0" />
         <PackageReference Include="Il2CppInterop.Runtime" Version="1.0.0" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(Configuration)' == 'Release_IL2CPP_Interop_ML' and '$(MelonLoaderRuntimePath)' != ''">
+        <Reference Include="Il2CppInterop.Common">
+            <HintPath>$(MelonLoaderRuntimePath)\Il2CppInterop.Common.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="Il2CppInterop.Runtime">
+            <HintPath>$(MelonLoaderRuntimePath)\Il2CppInterop.Runtime.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
     </ItemGroup>
     <!-- Assembly References -->
     <ItemGroup Condition="'$(Configuration)' == 'Release_Mono'">
@@ -125,7 +138,11 @@
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.CoreModule">
-            <HintPath>..\lib\interop\UnityEngine.CoreModule.dll</HintPath>
+            <HintPath>$(GameAssembliesPath)\UnityEngine.CoreModule.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.AssetBundleModule">
+            <HintPath>$(GameAssembliesPath)\UnityEngine.AssetBundleModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.PhysicsModule">

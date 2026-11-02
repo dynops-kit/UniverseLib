@@ -33,7 +33,7 @@ internal class Il2CppTextureHelper : TextureHelper
     {
         try
         {
-            return new(width, height, TextureFormat.RGBA32, 1, false, IntPtr.Zero);
+            return new(width, height, TextureFormat.RGBA32, 1, false);
         }
         catch (MissingMethodException)
         {
@@ -46,7 +46,7 @@ internal class Il2CppTextureHelper : TextureHelper
     {
         try
         {
-            return new(width, height, textureFormat, mipChain ? -1 : 1, false, IntPtr.Zero);
+            return new(width, height, textureFormat, mipChain ? -1 : 1, false);
         }
         catch (MissingMethodException)
         {
