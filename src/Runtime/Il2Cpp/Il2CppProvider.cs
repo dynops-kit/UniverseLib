@@ -33,9 +33,9 @@ namespace UniverseLib.Runtime.Il2Cpp
 
         internal delegate IntPtr d_FindObjectsOfTypeAll(IntPtr type);
 
-        internal delegate void d_GetRootGameObjects(int handle, IntPtr list);
+        internal delegate void d_GetRootGameObjects(SceneHandle handle, IntPtr list);
 
-        internal delegate int d_GetRootCountInternal(int handle);
+        internal delegate int d_GetRootCountInternal(SceneHandle handle);
 
         protected internal override void OnInitialize()
         {
@@ -124,7 +124,7 @@ namespace UniverseLib.Runtime.Il2Cpp
         /// <summary>
         /// Gets the <see cref="Scene.rootCount"/> for the provided scene handle.
         /// </summary>
-        protected internal static int GetRootCount(int sceneHandle)
+        protected internal static int GetRootCount(SceneHandle sceneHandle)
         {
             return ICallManager.GetICall<d_GetRootCountInternal>("UnityEngine.SceneManagement.Scene::GetRootCountInternal")
                    .Invoke(sceneHandle);

@@ -106,7 +106,7 @@ public class InputSystem : IHandleInput
         SetupSupportedDevices();
 
         p_kbCurrent = TKeyboard.GetProperty("current");
-        p_kbIndexer = TKeyboard.GetProperty("Item", [ TKey ]);
+        p_kbIndexer = TKeyboard.GetProperty("Item", new[] { TKey });
 
         Type t_btnControl = ReflectionUtility.GetTypeByName("UnityEngine.InputSystem.Controls.ButtonControl");
         p_btnIsPressed = t_btnControl.GetProperty("isPressed");
@@ -159,7 +159,7 @@ public class InputSystem : IHandleInput
             Type supportedDeviceType = supportedDevices.GetActualType();
 #if CPP
             // weird hack for il2cpp, use the implicit operator and cast Il2CppStringArray to ReadOnlyArray<string>
-            object[] emptyStringArray =[ new Il2CppStringArray(0) ];
+            object[] emptyStringArray = { new Il2CppStringArray(0) };
             MethodInfo? op_implicit = supportedDeviceType.GetMethod("op_Implicit", BindingFlags.Static | BindingFlags.Public);
             if (op_implicit is null)
             {
@@ -266,7 +266,7 @@ public class InputSystem : IHandleInput
         if (!KeyCodeToKeyDict.ContainsKey(key))
         {
             object? parsed = KeyCodeToKeyEnum(key);
-            object? actualKey = p_kbIndexer is null ? default : p_kbIndexer.GetValue(CurrentKeyboard, [parsed]);
+            object? actualKey = p_kbIndexer is null ? default : p_kbIndexer.GetValue(CurrentKeyboard, new[] { parsed });
             KeyCodeToKeyDict.Add(key, actualKey);
         }
 
@@ -357,19 +357,19 @@ public class InputSystem : IHandleInput
 
         t_InputExtensions = ReflectionUtility.GetTypeByName("UnityEngine.InputSystem.InputActionSetupExtensions");
 
-        MethodInfo? addMap = t_InputExtensions.GetMethod("AddActionMap", [ assetType, typeof(string) ]);
+        MethodInfo? addMap = t_InputExtensions.GetMethod("AddActionMap", new[] { assetType, typeof(string) });
         if (addMap is null)
         {
             Universe.LogWarning("Unable to add ActionMap, Input will not work!");
             return;
         }
-        object map = addMap.Invoke(null, [ asset, "UI" ])
+        object map = addMap.Invoke(null, new object[] { asset, "UI" })
             .TryCast(ReflectionUtility.GetTypeByName("UnityEngine.InputSystem.InputActionMap"));
 
-        CreateAction(map, "point", [ "<Mouse>/position" ], "point");
-        CreateAction(map, "click", [ "<Mouse>/leftButton" ], "leftClick");
-        CreateAction(map, "rightClick", [ "<Mouse>/rightButton" ], "rightClick");
-        CreateAction(map, "scrollWheel", [ "<Mouse>/scroll" ], "scrollWheel");
+        CreateAction(map, "point", new[] { "<Mouse>/position" }, "point");
+        CreateAction(map, "click", new[] { "<Mouse>/leftButton" }, "leftClick");
+        CreateAction(map, "rightClick", new[] { "<Mouse>/rightButton" }, "rightClick");
+        CreateAction(map, "scrollWheel", new[] { "<Mouse>/scroll" }, "scrollWheel");
 
         m_UI_Enable = map.GetType().GetMethod("Enable");
         if (m_UI_Enable is null)
@@ -406,11 +406,11 @@ public class InputSystem : IHandleInput
             Universe.LogWarning($"Unable to AddAction, Input Action:{actionName} will not work!");
             return;
         }
-        object action = addAction.Invoke(null, [ map, actionName, default, null, null, null, null, null ])
+        object action = addAction.Invoke(null, new object[] { map, actionName, default, null, null, null, null, null })
             .TryCast(inputActionType);
 
         MethodInfo? addBinding = t_InputExtensions?.GetMethod(
-            "AddBinding", [ inputActionType, typeof(string), typeof(string), typeof(string), typeof(string) ]);
+            "AddBinding", new[] { inputActionType, typeof(string), typeof(string), typeof(string), typeof(string) });
         if (addBinding is null)
         {
             Universe.LogWarning($"Unable to AddBinding, Input Action:{actionName} will not work!");
@@ -418,10 +418,10 @@ public class InputSystem : IHandleInput
         }
 
         foreach (string binding in bindings)
-            addBinding.Invoke(null, [ action.TryCast(inputActionType), binding, null, null, null ]);
+            addBinding.Invoke(null, new object[] { action.TryCast(inputActionType), binding, null, null, null });
 
         Type refType = ReflectionUtility.GetTypeByName("UnityEngine.InputSystem.InputActionReference");
-        object? inputRef = refType.GetMethod("Create")?.Invoke(null, [ action ]).TryCast(refType);
+        object? inputRef = refType.GetMethod("Create")?.Invoke(null, new[] { action }).TryCast(refType);
 
         TInputSystemUIInputModule
             .GetProperty(propertyName)?

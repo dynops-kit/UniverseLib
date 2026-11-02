@@ -284,22 +284,21 @@ public static class UniversalUI
 
     static AssetBundle LoadBundle(string id)
     {
-        AssetBundle bundle = AssetBundle.LoadFromMemory(ReadFully(typeof(Universe)
-                .Assembly
-                .GetManifestResourceStream($"UniverseLib.Resources.{id}.bundle")));
+        string resourceName = $"UniverseLib.Resources.{id}.bundle";
+        using Stream resource = typeof(Universe).Assembly.GetManifestResourceStream(resourceName)
+            ?? throw new FileNotFoundException($"Embedded UI bundle resource was not found: {resourceName}");
+
+        string directory = Path.Combine(Path.GetTempPath(), "UniverseLib");
+        Directory.CreateDirectory(directory);
+        string path = Path.Combine(directory, $"UI-{id}.bundle");
+        using (FileStream file = File.Create(path))
+            resource.CopyTo(file);
+
+        // Load through the file-based IL2CPP API to avoid the Unity 6.3 byte-array trampoline.
+        AssetBundle bundle = AssetBundle.LoadFromFile(path);
         if (bundle)
             Universe.Log($"Loaded {id} bundle for Unity {Application.unityVersion}");
         return bundle;
-    }
-
-    static byte[] ReadFully(Stream input)
-    {
-        using MemoryStream ms = new();
-        byte[] buffer = new byte[81920];
-        int read;
-        while ((read = input.Read(buffer, 0, buffer.Length)) != 0)
-            ms.Write(buffer, 0, read);
-        return ms.ToArray();
     }
 
     // AssetBundle patch
